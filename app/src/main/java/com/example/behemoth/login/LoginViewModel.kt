@@ -1,7 +1,7 @@
-package com.example.behemoth.ui.main
+package com.example.behemoth.login
 
 import androidx.lifecycle.ViewModel
 
-class MainViewModel : ViewModel() {
+class LoginViewModel : ViewModel() {
     // TODO: Implement the ViewModel
 }
