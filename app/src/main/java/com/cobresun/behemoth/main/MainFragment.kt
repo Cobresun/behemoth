@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cobresun.behemoth.R
+import com.cobresun.behemoth.models.Entry
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,6 +51,12 @@ class MainFragment : Fragment() {
 
                 if (snapshot != null && !snapshot.isEmpty) {
                     toast("Current number of objects: ${snapshot.size()}")
+                    for (obj in snapshot){
+                        val entryFromDB = Entry(obj.data["name"].toString(),
+                            obj.data["count"].toString().toInt())
+
+                        viewModel.addEntry(entryFromDB)
+                    }
                 } else {
                    toast( "Current data: null")
                 }
@@ -89,7 +97,7 @@ class MainFragment : Fragment() {
 
                     // Add entry only if detected object with over 90% confidence
                     if (label.confidence >= 0.9){
-                        viewModel.addEntry(label.text)
+                        viewModel.updateEntry(label.text, args.userUid)
                     }
                     else{
                         toast("Nothing found!")
