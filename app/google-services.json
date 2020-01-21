@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "520331261643",
+    "firebase_url": "https://behemoth-android.firebaseio.com",
+    "project_id": "behemoth-android",
+    "storage_bucket": "behemoth-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520331261643:android:9214f9f10ad5588be7cd4e",
+        "android_client_info": {
+          "package_name": "com.cobresun.behemoth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520331261643-nqom0qjg33hnr6sfev9s8lg4gvpj6ho0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIisbOBvwQ4SQ5ZpfjSACAQtu_QK1hME4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520331261643-nqom0qjg33hnr6sfev9s8lg4gvpj6ho0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
