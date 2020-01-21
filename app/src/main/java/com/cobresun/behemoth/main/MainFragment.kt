@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,9 +15,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cobresun.behemoth.R
 import com.cobresun.behemoth.models.Entry
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_main.*
 import splitties.toast.toast
 
@@ -45,20 +44,16 @@ class MainFragment : Fragment() {
             .collection("objects")
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
-                    toast("Listen failed. $e")
                     return@addSnapshotListener
                 }
-
                 if (snapshot != null && !snapshot.isEmpty) {
-                    toast("Current number of objects: ${snapshot.size()}")
-                    for (obj in snapshot){
-                        val entryFromDB = Entry(obj.data["name"].toString(),
-                            obj.data["count"].toString().toInt())
-
-                        viewModel.addEntry(entryFromDB)
+                    val entries = snapshot.map {
+                        Entry(
+                            it.data["name"].toString(),
+                            it.data["count"].toString().toInt()
+                        )
                     }
-                } else {
-                   toast( "Current data: null")
+                    viewModel.loadEntries(entries)
                 }
             }
 
@@ -81,32 +76,33 @@ class MainFragment : Fragment() {
             // Retrieve and format image from camera as Bitmap
             val imageBitmap = (data!!.extras!!.get("data") as Bitmap)
                 .copy(Bitmap.Config.ARGB_8888, true)
-
-            val image = FirebaseVisionImage.fromBitmap(imageBitmap)
-            val labeler = FirebaseVision.getInstance().getOnDeviceImageLabeler()
-
-            labeler.processImage(image)
-                .addOnSuccessListener { labels ->
-                    if (labels.size <= 0){
-                        toast("Nothing found!")
-                        return@addOnSuccessListener
-                    }
-
-                    // Only look at first (main) object
-                    val label = labels[0]
-
-                    // Add entry only if detected object with over 90% confidence
-                    if (label.confidence >= 0.9){
-                        viewModel.updateEntry(label.text, args.userUid)
-                    }
-                    else{
-                        toast("Nothing found!")
-                    }
-                }
-                .addOnFailureListener { e ->
-                    toast(e.toString())
-                }
+            labelImage(imageBitmap)
         }
+    }
+
+    private fun labelImage(imageBitmap: Bitmap) {
+        val image = FirebaseVisionImage.fromBitmap(imageBitmap)
+        val labeler = FirebaseVision.getInstance().onDeviceImageLabeler
+
+        labeler.processImage(image)
+            .addOnSuccessListener { labels ->
+                if (labels.size <= 0) {
+                    toast("Nothing found!")
+                    return@addOnSuccessListener
+                }
+
+                val label = labels[0]
+
+                if (label.confidence >= 0.9) {
+                    viewModel.updateEntry(label.text, args.userUid)
+                    toast("Added ${label.text}!")
+                } else {
+                    toast("Nothing found!")
+                }
+            }
+            .addOnFailureListener { e ->
+                toast(e.toString())
+            }
     }
 
     private fun dispatchTakePictureIntent() {
