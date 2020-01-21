@@ -1,4 +1,4 @@
-package com.example.behemoth.login
+package com.cobresun.behemoth.login
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.behemoth.R
+import com.cobresun.behemoth.R
 import kotlinx.android.synthetic.main.login_fragment.*
 
 class LoginFragment : Fragment() {

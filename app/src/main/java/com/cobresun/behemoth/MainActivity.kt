@@ -1,8 +1,7 @@
-package com.example.behemoth
+package com.cobresun.behemoth
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.behemoth.login.LoginFragment
 
 class MainActivity : AppCompatActivity() {
 

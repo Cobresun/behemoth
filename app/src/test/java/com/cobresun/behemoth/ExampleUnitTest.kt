@@ -1,4 +1,4 @@
-package com.example.behemoth
+package com.cobresun.behemoth
 
 import org.junit.Test
 

@@ -1,9 +1,9 @@
-package com.example.behemoth.main
+package com.cobresun.behemoth.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.behemoth.models.Entry
+import com.cobresun.behemoth.models.Entry
 
 class MainViewModel : ViewModel() {
 

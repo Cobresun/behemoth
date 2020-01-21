@@ -1,12 +1,12 @@
-package com.example.behemoth.main
+package com.cobresun.behemoth.main
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.behemoth.R
-import com.example.behemoth.models.Entry
+import com.cobresun.behemoth.R
+import com.cobresun.behemoth.models.Entry
 import kotlinx.android.synthetic.main.item_entry_card.view.*
 
 class EntryAdapter(

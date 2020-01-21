@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.behemoth.login.LoginFragment"
+        android:name="com.cobresun.behemoth.login.LoginFragment"
         android:label="login_fragment"
         tools:layout="@layout/login_fragment">
         <action
@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.behemoth.main.MainFragment"
+        android:name="com.cobresun.behemoth.main.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" />
 

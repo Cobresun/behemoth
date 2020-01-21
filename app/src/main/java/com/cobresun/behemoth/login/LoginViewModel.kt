@@ -1,4 +1,4 @@
-package com.example.behemoth.login
+package com.cobresun.behemoth.login
 
 import androidx.lifecycle.ViewModel
 
