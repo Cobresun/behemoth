@@ -10,18 +10,28 @@
         android:name="com.cobresun.behemoth.login.LoginFragment"
         android:label="login_fragment"
         tools:layout="@layout/login_fragment">
+
         <action
             android:id="@+id/action_loginFragment_to_mainFragment"
             app:destination="@id/mainFragment"
             app:launchSingleTop="true"
             app:popUpTo="@+id/navigation"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true">
+
+        </action>
     </fragment>
 
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.cobresun.behemoth.main.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_main">
+
+        <argument
+            android:name="userUid"
+            app:argType="string"
+            app:nullable="false" />
+
+    </fragment>
 
 </navigation>

@@ -62,20 +62,13 @@ class LoginFragment : Fragment() {
                 val db = FirebaseFirestore.getInstance()
                 if (response!!.isNewUser) {
                     db.collection("users")
-                        .add(userObj)
-                        .addOnSuccessListener { documentReference ->
-                            toast("DocumentSnapshot added with ID: ${documentReference.id}")
-                        }
-                        .addOnFailureListener { e ->
-                            toast("Error adding user: $e")
-                        }
+                        .document(user.uid)
+                        .set(userObj)
                 }
-                navController.navigate(R.id.action_loginFragment_to_mainFragment)
+
+                val action = LoginFragmentDirections.actionLoginFragmentToMainFragment(user.uid)
+                navController.navigate(action)
             } else {
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
                 response?.let {
                     toast("Error signing in: ${response.error}")
                 }
