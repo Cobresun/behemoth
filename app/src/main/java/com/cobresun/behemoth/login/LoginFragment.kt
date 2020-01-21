@@ -13,6 +13,7 @@ import com.cobresun.behemoth.R
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.login_fragment.*
 import splitties.toast.toast
 
@@ -52,14 +53,32 @@ class LoginFragment : Fragment() {
             val response = IdpResponse.fromResultIntent(data)
 
             if (resultCode == Activity.RESULT_OK) {
-                val user = FirebaseAuth.getInstance().currentUser
+                val user = FirebaseAuth.getInstance().currentUser!!
+                val userObj = hashMapOf(
+                    "uid" to user.uid,
+                    "email" to user.email
+                )
+
+                val db = FirebaseFirestore.getInstance()
+                if (response!!.isNewUser) {
+                    db.collection("users")
+                        .add(userObj)
+                        .addOnSuccessListener { documentReference ->
+                            toast("DocumentSnapshot added with ID: ${documentReference.id}")
+                        }
+                        .addOnFailureListener { e ->
+                            toast("Error adding user: $e")
+                        }
+                }
                 navController.navigate(R.id.action_loginFragment_to_mainFragment)
             } else {
                 // Sign in failed. If response is null the user canceled the
                 // sign-in flow using the back button. Otherwise check
                 // response.getError().getErrorCode() and handle the error.
                 // ...
-                toast("Didn't sign-in!")
+                response?.let {
+                    toast("Error signing in: ${response.error}")
+                }
             }
         }
     }
