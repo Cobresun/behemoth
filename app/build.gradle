@@ -54,4 +54,7 @@ dependencies {
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.1.0"
     implementation "androidx.navigation:navigation-ui-ktx:2.1.0"
+
+    // Splitties
+    implementation "com.louiscad.splitties:splitties-toast:3.0.0-alpha06"
 }
