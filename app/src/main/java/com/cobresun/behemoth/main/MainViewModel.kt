@@ -13,60 +13,53 @@ class MainViewModel : ViewModel() {
 
 
     fun loadEntries(entries: List<Entry>) {
-        _entries.value = entries
+        _entries.value = entries.sortedBy { it.name }
     }
 
-    fun updateEntry(name: String, userID: String) {
+    fun upsertEntry(name: String, userID: String) {
         val current = _entries.value ?: emptyList()
+
+        if (current.any { it.name == name }) {
+            updateEntry(current, name, userID)
+        } else {
+            insertEntry(current, name, userID)
+        }
+    }
+
+    private fun insertEntry(current: List<Entry>, name: String, userID: String) {
         val newEntries = current.toMutableList()
+        val newEntry = Entry(name, 1)
+        newEntries.add(newEntry)
+        _entries.value = newEntries.sortedBy { it.name }
+        pushToFirebase(newEntry, userID)
+    }
+
+    private fun updateEntry(current: List<Entry>, name: String, userID: String) {
+        val newEntries = current.toMutableList()
+        val targetIndex = current.indexOfFirst { it.name == name }
+
+        val newCount = current[targetIndex].count + 1
+        val newEntry = Entry(name, newCount)
+
+        newEntries.removeAt(targetIndex)
+        newEntries.add(targetIndex, newEntry)
+        _entries.value = newEntries.sortedBy { it.name }
+
+        pushToFirebase(newEntry, userID)
+    }
+
+    private fun pushToFirebase(entry: Entry, userID: String) {
         val db = FirebaseFirestore.getInstance()
 
-        // Insert into entries (update if exists) in alphabetical order
-        if (newEntries.none { it.name == (name) }) {
-            var index = newEntries.indexOfFirst { entry ->
-                entry.name.compareTo(name, true) > 0
-            }
-
-            val newEntry = Entry(name, 1)
-
-            if (index == -1) {
-                index = newEntries.size
-            }
-
-            newEntries.add(index, newEntry)
-
-            val entryObj = hashMapOf(
-                "count" to 1,
-                "name" to name
-            )
-
-            db.collection("users")
-                .document(userID)
-                .collection("objects")
-                .document(name)
-                .set(entryObj)
-        } else {
-            val index = newEntries.indexOfFirst { ent -> ent.name == name }
-
-            val newCount = newEntries[index].count + 1
-            val newEntry = Entry(name, newCount)
-
-            newEntries.removeAt(index)
-            newEntries.add(index, newEntry)
-
-            val entryObj = hashMapOf(
-                "count" to newCount,
-                "name" to name
-            )
-
-            db.collection("users")
-                .document(userID)
-                .collection("objects")
-                .document(name)
-                .set(entryObj)
-        }
-
-        _entries.value = newEntries
+        val entryObj = hashMapOf(
+            "count" to entry.count,
+            "name" to entry.name
+        )
+        db.collection("users")
+            .document(userID)
+            .collection("objects")
+            .document(entry.name)
+            .set(entryObj)
     }
 
 }

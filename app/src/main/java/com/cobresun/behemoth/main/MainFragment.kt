@@ -94,7 +94,7 @@ class MainFragment : Fragment() {
                 val label = labels[0]
 
                 if (label.confidence >= 0.9) {
-                    viewModel.updateEntry(label.text, args.userUid)
+                    viewModel.upsertEntry(label.text, args.userUid)
                     toast("Added ${label.text}!")
                 } else {
                     toast("Nothing found!")
