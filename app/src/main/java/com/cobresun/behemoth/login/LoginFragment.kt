@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.cobresun.behemoth.R
 import com.firebase.ui.auth.AuthUI
@@ -19,12 +18,11 @@ import splitties.toast.toast
 
 class LoginFragment : Fragment() {
 
-    private val RC_SIGN_IN: Int = 8888
     private val navController by lazy { this.findNavController() }
 
-    private val viewModel: LoginViewModel by viewModels()
-
+    private val RC_SIGN_IN: Int = 8888
     private val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +33,8 @@ class LoginFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        auth = FirebaseAuth.getInstance()
+
         login_button.setOnClickListener {
             startActivityForResult(
                 AuthUI.getInstance()
@@ -43,6 +43,16 @@ class LoginFragment : Fragment() {
                     .build(),
                 RC_SIGN_IN
             )
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        currentUser?.let {
+            val action = LoginFragmentDirections.actionLoginFragmentToMainFragment(it.uid)
+            navController.navigate(action)
         }
     }
 
