@@ -5,16 +5,16 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cobresun.behemoth.R
 import com.cobresun.behemoth.models.Entry
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
@@ -28,6 +28,12 @@ class MainFragment : Fragment() {
     private val REQUEST_IMAGE_CAPTURE = 1
 
     private val args: MainFragmentArgs by navArgs()
+    private val navController by lazy { this.findNavController() }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,6 +75,11 @@ class MainFragment : Fragment() {
         viewModel.entries.observe(viewLifecycleOwner, Observer {
             entriesAdapter.setData(it ?: emptyList())
         })
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        activity?.title = resources.getString(R.string.main_screen_title)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -113,4 +124,19 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_toolbar, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                FirebaseAuth.getInstance().signOut()
+                navController.navigate(R.id.action_mainFragment_to_loginFragment)
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }
