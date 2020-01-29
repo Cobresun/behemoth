@@ -136,6 +136,29 @@ class MainFragment : Fragment() {
                 navController.navigate(R.id.action_mainFragment_to_loginFragment)
                 return true
             }
+            R.id.action_delete -> {
+                FirebaseFirestore
+                    .getInstance()
+                    .collection("users")
+                    .document(args.userUid)
+                    .delete()
+                    .addOnSuccessListener {
+                        FirebaseAuth
+                            .getInstance()
+                            .currentUser!!
+                            .delete()
+                            .addOnSuccessListener {
+                                navController.navigate(R.id.action_mainFragment_to_loginFragment)
+                            }
+                            .addOnFailureListener {
+                                toast("Unable to delete")
+                            }
+                    }
+                    .addOnFailureListener {
+                        toast("Unable to delete")
+                    }
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
