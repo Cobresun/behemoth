@@ -3,17 +3,45 @@ package com.cobresun.behemoth.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.cobresun.behemoth.models.Entry
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val userUid: String) : ViewModel() {
+
+    class MainViewModelFactory(
+        private val userUid: String
+    ) : ViewModelProvider.NewInstanceFactory() {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return MainViewModel(userUid) as T
+        }
+    }
 
     private val _entries: MutableLiveData<List<Entry>> = MutableLiveData()
     val entries: LiveData<List<Entry>> = _entries
 
 
-    fun loadEntries(entries: List<Entry>) {
-        _entries.value = entries.sortedBy { it.name }
+    init {
+        // TODO: Move to its own class
+        FirebaseFirestore
+            .getInstance()
+            .collection("users")
+            .document(userUid)
+            .collection("objects")
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    return@addSnapshotListener
+                }
+                if (snapshot != null && !snapshot.isEmpty) {
+                    val entries = snapshot.map {
+                        Entry(
+                            it.data["name"].toString(),
+                            it.data["count"].toString().toInt()
+                        )
+                    }
+                    _entries.value = entries.sortedBy { it.name }
+                }
+            }
     }
 
     fun upsertEntry(name: String, userID: String) {

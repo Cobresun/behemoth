@@ -7,13 +7,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.cobresun.behemoth.R
-import com.cobresun.behemoth.models.Entry
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ml.vision.FirebaseVision
@@ -23,7 +22,12 @@ import splitties.toast.toast
 
 class MainFragment : Fragment() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel by lazy {
+        ViewModelProviders.of(
+            this, MainViewModel.MainViewModelFactory(args.userUid)
+        )[MainViewModel::class.java]
+    }
+
     private val entriesAdapter = EntryAdapter(emptyList())
     private val REQUEST_IMAGE_CAPTURE = 1
 
@@ -44,24 +48,6 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        FirebaseFirestore.getInstance().collection("users")
-            .document(args.userUid)
-            .collection("objects")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    return@addSnapshotListener
-                }
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val entries = snapshot.map {
-                        Entry(
-                            it.data["name"].toString(),
-                            it.data["count"].toString().toInt()
-                        )
-                    }
-                    viewModel.loadEntries(entries)
-                }
-            }
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -132,34 +118,42 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
-                FirebaseAuth.getInstance().signOut()
-                navController.navigate(R.id.action_mainFragment_to_loginFragment)
+                logoutUser()
                 return true
             }
             R.id.action_delete -> {
-                FirebaseFirestore
-                    .getInstance()
-                    .collection("users")
-                    .document(args.userUid)
-                    .delete()
-                    .addOnSuccessListener {
-                        FirebaseAuth
-                            .getInstance()
-                            .currentUser!!
-                            .delete()
-                            .addOnSuccessListener {
-                                navController.navigate(R.id.action_mainFragment_to_loginFragment)
-                            }
-                            .addOnFailureListener {
-                                toast("Unable to delete")
-                            }
-                    }
-                    .addOnFailureListener {
-                        toast("Unable to delete")
-                    }
+                deleteUser()
                 return true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun logoutUser() {
+        FirebaseAuth.getInstance().signOut()
+        navController.navigate(R.id.action_mainFragment_to_loginFragment)
+    }
+
+    private fun deleteUser() {
+        FirebaseFirestore
+            .getInstance()
+            .collection("users")
+            .document(args.userUid)
+            .delete()
+            .addOnSuccessListener {
+                FirebaseAuth
+                    .getInstance()
+                    .currentUser!!
+                    .delete()
+                    .addOnSuccessListener {
+                        navController.navigate(R.id.action_mainFragment_to_loginFragment)
+                    }
+                    .addOnFailureListener {
+                        toast("Unable to delete")
+                    }
+            }
+            .addOnFailureListener {
+                toast("Unable to delete")
+            }
     }
 }
