@@ -20,7 +20,6 @@ class LoginFragment : Fragment() {
 
     private val navController by lazy { this.findNavController() }
 
-    private val RC_SIGN_IN: Int = 8888
     private val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
     private lateinit var auth: FirebaseAuth
 
@@ -84,6 +83,10 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val RC_SIGN_IN: Int = 8888
     }
 
 }

@@ -7,8 +7,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.cobresun.behemoth.models.Entry
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MainViewModel(private val userUid: String) : ViewModel() {
+class MainViewModel(userUid: String) : ViewModel() {
 
+    @Suppress("UNCHECKED_CAST")
     class MainViewModelFactory(
         private val userUid: String
     ) : ViewModelProvider.NewInstanceFactory() {

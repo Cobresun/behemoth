@@ -29,7 +29,6 @@ class MainFragment : Fragment() {
     }
 
     private val entriesAdapter = EntryAdapter(emptyList())
-    private val REQUEST_IMAGE_CAPTURE = 1
 
     private val args: MainFragmentArgs by navArgs()
     private val navController by lazy { this.findNavController() }
@@ -155,5 +154,9 @@ class MainFragment : Fragment() {
             .addOnFailureListener {
                 toast("Unable to delete")
             }
+    }
+
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE = 1
     }
 }
